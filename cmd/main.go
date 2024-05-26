@@ -1,8 +1,6 @@
 package main
 
 import (
-	"eco_sort/config"
-	"eco_sort/delivery/http_api"
 	"flag"
 	"fmt"
 	"os"
@@ -11,6 +9,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Eco-Sort/eco_sort_backend/config"
+	"github.com/Eco-Sort/eco_sort_backend/delivery/http_api"
 	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -90,6 +90,7 @@ func bootstrapFiber() *fiber.App {
 		}),
 
 		func(c *fiber.Ctx) error {
+			c.Locals("wg", wg)
 			return c.Next()
 		},
 

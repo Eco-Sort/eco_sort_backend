@@ -1,4 +1,4 @@
-module eco_sort
+module github.com/Eco-Sort/eco_sort_backend
 
 go 1.21.0
 
