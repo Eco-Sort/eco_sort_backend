@@ -11,6 +11,8 @@ import (
 
 	"github.com/Eco-Sort/eco_sort_backend/config"
 	"github.com/Eco-Sort/eco_sort_backend/delivery/http_api"
+	"github.com/Eco-Sort/eco_sort_backend/domain"
+	"github.com/Eco-Sort/eco_sort_backend/service/auth"
 	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -18,6 +20,11 @@ import (
 )
 
 var wgInstance *sync.WaitGroup
+
+// Service
+var (
+	authService domain.AuthService
+)
 
 func NewWaitGroup() *sync.WaitGroup {
 	if wgInstance == nil {
@@ -34,7 +41,10 @@ func bootstrap() {
 }
 
 func bootstrapServices() {
+	serviceTimeOut := 180 * time.Second
 
+	authService = auth.NewAuthService(
+		serviceTimeOut)
 }
 
 func bootstrapFiber() *fiber.App {
@@ -124,6 +134,7 @@ func initHttp() {
 	apiRoute := app.Group("/api")
 	// Web API Route V1
 	wV1ApiRoute := apiRoute.Group("/v1")
+	http_api.NewAuthHttpApiDelivery(wV1ApiRoute, authService)
 
 	// Admin Route
 	adminApiRoute := wV1ApiRoute.Group("/admin")

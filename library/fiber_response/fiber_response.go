@@ -1,0 +1,34 @@
+package fiber_response
+
+import "github.com/gofiber/fiber/v2"
+
+func ReturnStatusUnprocessableEntity(c *fiber.Ctx, messages string, errorData any) error {
+	statusCode := fiber.StatusUnprocessableEntity
+	return c.Status(statusCode).JSON(fiber.Map{
+		"status":  statusCode,
+		"message": messages,
+		"data": map[string]map[string]any{
+			"errors": {
+				"general": messages,
+			},
+		},
+	})
+}
+
+func ReturnStatusOk(c *fiber.Ctx, messages string, data any) error {
+	statusCode := fiber.StatusOK
+	return c.Status(statusCode).JSON(fiber.Map{
+		"status":  statusCode,
+		"message": messages,
+		"data":    data,
+	})
+}
+
+func ReturnStatusUnauthorized(c *fiber.Ctx) error {
+	statusCode := fiber.StatusUnauthorized
+	return c.Status(statusCode).JSON(fiber.Map{
+		"status":  statusCode,
+		"message": "Unauthorized",
+		"data":    []string{},
+	})
+}
