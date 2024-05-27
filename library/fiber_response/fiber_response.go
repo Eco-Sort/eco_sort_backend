@@ -32,3 +32,11 @@ func ReturnStatusUnauthorized(c *fiber.Ctx) error {
 		"data":    []string{},
 	})
 }
+
+func ReturnStatusServerError(c *fiber.Ctx, messages string, err error) error {
+	statusCode := fiber.StatusInternalServerError
+	return c.Status(statusCode).JSON(fiber.Map{
+		"status":  statusCode,
+		"message": messages,
+	})
+}

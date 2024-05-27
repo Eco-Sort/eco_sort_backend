@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"runtime/debug"
 	"sync"
 	"syscall"
 	"time"
@@ -12,6 +13,7 @@ import (
 	"github.com/Eco-Sort/eco_sort_backend/config"
 	"github.com/Eco-Sort/eco_sort_backend/delivery/http_api"
 	"github.com/Eco-Sort/eco_sort_backend/domain"
+	"github.com/Eco-Sort/eco_sort_backend/library/middleware"
 	"github.com/Eco-Sort/eco_sort_backend/service/auth"
 	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
@@ -88,6 +90,8 @@ func bootstrapFiber() *fiber.App {
 		func(c *fiber.Ctx) error {
 			defer func() {
 				if r := recover(); r != nil {
+					id := time.Now().Unix()
+					fmt.Printf("Server Panic Occured [CrashID: %d]\n[PanicMessage]:%s\n[PanicStack]:%s\n", id, r, string(debug.Stack()))
 					c.Status(fiber.StatusInternalServerError).SendString("Server Error")
 				}
 			}()
@@ -100,6 +104,7 @@ func bootstrapFiber() *fiber.App {
 		}),
 
 		func(c *fiber.Ctx) error {
+			c.Locals("auth_service", &authService)
 			c.Locals("wg", wg)
 			return c.Next()
 		},
@@ -137,7 +142,7 @@ func initHttp() {
 	http_api.NewAuthHttpApiDelivery(wV1ApiRoute, authService)
 
 	// Admin Route
-	adminApiRoute := wV1ApiRoute.Group("/admin")
+	adminApiRoute := wV1ApiRoute.Group("/admin", middleware.ValidateJWT)
 	http_api.NewAdminUserHttpApiDelivery(adminApiRoute)
 
 	//Client Route

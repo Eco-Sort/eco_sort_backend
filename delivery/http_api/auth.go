@@ -3,9 +3,11 @@ package http_api
 import (
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/Eco-Sort/eco_sort_backend/domain"
 	"github.com/Eco-Sort/eco_sort_backend/library/fiber_response"
+	"github.com/Eco-Sort/eco_sort_backend/library/middleware"
 	"github.com/asaskevich/govalidator"
 	"github.com/gofiber/fiber/v2"
 )
@@ -46,6 +48,13 @@ func (h *httpAuthApiDelivery) AuthLogin(ctx *fiber.Ctx) error {
 	if !authRes {
 		return fiber_response.ReturnStatusUnauthorized(ctx)
 	}
-
-	return fiber_response.ReturnStatusOk(ctx, fmt.Sprintf("Welcome %s", req.Username), nil)
+	tokenExpire := time.Now().Add(time.Hour * 24).Unix()
+	token, err := middleware.CreateToken(1, tokenExpire)
+	if err != nil {
+		return fiber_response.ReturnStatusUnprocessableEntity(ctx, err.Error(), err)
+	}
+	return fiber_response.ReturnStatusOk(ctx, fmt.Sprintf("Welcome %s", req.Username), map[string]any{
+		"token":  token,
+		"userId": 1,
+	})
 }

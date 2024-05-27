@@ -25,3 +25,11 @@ func GetAppPort() string {
 	}
 	return "8000"
 }
+
+func JWTSecretKey() []byte {
+	env := os.Getenv("JWT_SECRET_KEY")
+	if env != "" {
+		return []byte(env)
+	}
+	return []byte("secret")
+}
