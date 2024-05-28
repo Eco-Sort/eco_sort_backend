@@ -67,8 +67,14 @@ func (c *authService) ValidateToken(token string) (domain.TokenPayload, error) {
 		return domain.TokenPayload{}, fmt.Errorf("could not claim user_id")
 	}
 
+	role, ok := claims["role"].(string)
+	if !ok {
+		return domain.TokenPayload{}, fmt.Errorf("could not claim role")
+	}
+
 	return domain.TokenPayload{
 		UserId: uint(userId),
+		Role:   role,
 		Exp:    int64(expiration),
 	}, nil
 }

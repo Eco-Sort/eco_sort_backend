@@ -49,7 +49,7 @@ func (h *httpAuthApiDelivery) AuthLogin(ctx *fiber.Ctx) error {
 		return fiber_response.ReturnStatusUnauthorized(ctx)
 	}
 	tokenExpire := time.Now().Add(time.Hour * 24).Unix()
-	token, err := middleware.CreateToken(1, tokenExpire)
+	token, err := middleware.CreateToken(1, domain.Admin, tokenExpire)
 	if err != nil {
 		return fiber_response.ReturnStatusUnprocessableEntity(ctx, err.Error(), err)
 	}

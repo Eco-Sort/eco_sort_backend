@@ -13,9 +13,10 @@ import (
 func GetUserId(ctx *fiber.Ctx) uint {
 	return ctx.Locals("user_id").(uint)
 }
-func CreateToken(userId int64, tokenExpire int64) (string, error) {
+func CreateToken(userId int64, role domain.Role, tokenExpire int64) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": userId,
+		"role":    role,
 		"exp":     tokenExpire,
 	}
 
