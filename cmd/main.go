@@ -62,6 +62,7 @@ func bootstrapFiber() *fiber.App {
 			ReadTimeout:           time.Second * 60,
 			CaseSensitive:         true,
 			BodyLimit:             25 * 1024 * 1024,
+			Network:               "tcp",
 			ErrorHandler: func(c *fiber.Ctx, err error) error {
 				// Status code defaults to 500
 				code := fiber.StatusInternalServerError

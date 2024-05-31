@@ -7,11 +7,6 @@ func ReturnStatusUnprocessableEntity(c *fiber.Ctx, messages string, errorData an
 	return c.Status(statusCode).JSON(fiber.Map{
 		"status":  statusCode,
 		"message": messages,
-		"data": map[string]map[string]any{
-			"errors": {
-				"general": messages,
-			},
-		},
 	})
 }
 
@@ -29,7 +24,6 @@ func ReturnStatusUnauthorized(c *fiber.Ctx) error {
 	return c.Status(statusCode).JSON(fiber.Map{
 		"status":  statusCode,
 		"message": "Unauthorized",
-		"data":    []string{},
 	})
 }
 

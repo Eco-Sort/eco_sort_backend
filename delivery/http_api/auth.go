@@ -1,7 +1,6 @@
 package http_api
 
 import (
-	"fmt"
 	"sync"
 	"time"
 
@@ -54,8 +53,8 @@ func (h *httpAuthApiDelivery) AuthLogin(ctx *fiber.Ctx) error {
 	if err != nil {
 		return fiber_response.ReturnStatusUnprocessableEntity(ctx, err.Error(), err)
 	}
-	return fiber_response.ReturnStatusOk(ctx, fmt.Sprintf("Welcome %s", req.Username), map[string]any{
-		"token":  token,
-		"userId": 1,
+	return fiber_response.ReturnStatusOk(ctx, "Welcome", map[string]any{
+		"token":   token,
+		"user_id": 1,
 	})
 }
