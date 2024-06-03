@@ -2,33 +2,42 @@ package auth
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/Eco-Sort/eco_sort_backend/config"
 	"github.com/Eco-Sort/eco_sort_backend/domain"
 	"github.com/golang-jwt/jwt"
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 type authService struct {
 	contextTimeout time.Duration
+	userRepo       domain.UserRepository
 }
 
-func NewAuthService(t time.Duration) domain.AuthService {
+func NewAuthService(t time.Duration, userRepo domain.UserRepository) domain.AuthService {
 	return &authService{
 		contextTimeout: t,
+		userRepo:       userRepo,
 	}
 }
 
-func (c *authService) AuthenticateAdmin(user *domain.AuthLoginRequest) (bool, error) {
+func (c *authService) AuthenticateAdmin(user *domain.AuthLoginRequest) (domain.User, error) {
 	_, cancel := context.WithTimeout(context.Background(), c.contextTimeout)
 	defer cancel()
 
-	if user.Username == "admin" && user.Password == "admin" {
-		return true, nil
+	res, err := c.userRepo.GetByUsername(user.Username)
+	if err != nil {
+		return domain.User{}, err
 	}
-
-	return false, nil
+	err = bcrypt.CompareHashAndPassword([]byte(res.Password), []byte(user.Password))
+	if err != nil {
+		return domain.User{}, errors.New("passsword mismatch")
+	}
+	return res, nil
 }
 
 func (c *authService) ValidateToken(token string) (domain.TokenPayload, error) {
@@ -74,7 +83,19 @@ func (c *authService) ValidateToken(token string) (domain.TokenPayload, error) {
 
 	return domain.TokenPayload{
 		UserId: uint(userId),
-		Role:   role,
+		Role:   domain.Role(role),
 		Exp:    int64(expiration),
 	}, nil
+}
+
+func (c *authService) Register(req domain.AuthRegisterRequest) (uint, error) {
+	_, err := c.userRepo.GetByUsername(req.Username)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return 0, err
+	}
+	res, err := c.userRepo.Create(req)
+	if err != nil {
+		return 0, err
+	}
+	return res, nil
 }

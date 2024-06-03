@@ -13,9 +13,9 @@ import (
 func GetUserId(ctx *fiber.Ctx) uint {
 	return ctx.Locals("user_id").(uint)
 }
-func CreateToken(userId int64, role domain.Role, tokenExpire int64) (string, error) {
+func CreateToken(userId uint, role domain.Role, tokenExpire int64) (string, error) {
 	claims := jwt.MapClaims{
-		"user_id": userId,
+		"user_id": int64(userId),
 		"role":    role,
 		"exp":     tokenExpire,
 	}
@@ -46,6 +46,7 @@ func ValidateJWT(ctx *fiber.Ctx) error {
 	if err != nil {
 		return fiber_response.ReturnStatusUnauthorized(ctx)
 	} else {
+		ctx.Locals("role", res.Role)
 		ctx.Locals("user_id", res.UserId)
 		return ctx.Next()
 	}

@@ -13,12 +13,15 @@ import (
 	"github.com/Eco-Sort/eco_sort_backend/config"
 	"github.com/Eco-Sort/eco_sort_backend/delivery/http_api"
 	"github.com/Eco-Sort/eco_sort_backend/domain"
+	"github.com/Eco-Sort/eco_sort_backend/library/db"
 	"github.com/Eco-Sort/eco_sort_backend/library/middleware"
+	"github.com/Eco-Sort/eco_sort_backend/repository/mariadb"
 	"github.com/Eco-Sort/eco_sort_backend/service/auth"
 	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/joho/godotenv"
+	"gorm.io/gorm"
 )
 
 var wgInstance *sync.WaitGroup
@@ -45,8 +48,10 @@ func bootstrap() {
 func bootstrapServices() {
 	serviceTimeOut := 180 * time.Second
 
+	masterRepoUser := mariadb.NewMariadbUserRepository(db.Mariadb)
+
 	authService = auth.NewAuthService(
-		serviceTimeOut)
+		serviceTimeOut, masterRepoUser)
 }
 
 func bootstrapFiber() *fiber.App {
@@ -121,8 +126,16 @@ func bootstrapFiber() *fiber.App {
 	return app
 }
 
+func migrateMariadb(db *gorm.DB) {
+	db.AutoMigrate(
+		&domain.User{},
+	)
+}
+
 func main() {
 	bootstrap()
+	db.InitMariadb()
+	migrateMariadb(db.Mariadb)
 	bootstrapServices()
 
 	startHttp := flag.Bool("start-http", false, "Start HTTP server")

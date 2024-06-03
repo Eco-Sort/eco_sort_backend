@@ -34,3 +34,12 @@ func ReturnStatusServerError(c *fiber.Ctx, messages string, err error) error {
 		"message": messages,
 	})
 }
+
+func ReturnStatusCreated(c *fiber.Ctx, messages string, data any) error {
+	statusCode := fiber.StatusCreated
+	return c.Status(statusCode).JSON(fiber.Map{
+		"status":   statusCode,
+		"messages": messages,
+		"data":     data,
+	})
+}
