@@ -15,8 +15,10 @@ import (
 	"github.com/Eco-Sort/eco_sort_backend/domain"
 	"github.com/Eco-Sort/eco_sort_backend/library/db"
 	"github.com/Eco-Sort/eco_sort_backend/library/middleware"
+	gcstorage "github.com/Eco-Sort/eco_sort_backend/repository/gc_storage"
 	"github.com/Eco-Sort/eco_sort_backend/repository/mariadb"
 	"github.com/Eco-Sort/eco_sort_backend/service/auth"
+	gcimage "github.com/Eco-Sort/eco_sort_backend/service/image"
 	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -28,7 +30,8 @@ var wgInstance *sync.WaitGroup
 
 // Service
 var (
-	authService domain.AuthService
+	authService  domain.AuthService
+	imageService domain.ImageService
 )
 
 func NewWaitGroup() *sync.WaitGroup {
@@ -48,10 +51,14 @@ func bootstrap() {
 func bootstrapServices() {
 	serviceTimeOut := 180 * time.Second
 
+	//Master
 	masterRepoUser := mariadb.NewMariadbUserRepository(db.Mariadb)
 
-	authService = auth.NewAuthService(
-		serviceTimeOut, masterRepoUser)
+	//Buckets
+	bucketRepoImage := gcstorage.NewGcStorageRepository(db.GcStorage)
+
+	authService = auth.NewAuthService(serviceTimeOut, masterRepoUser)
+	imageService = gcimage.NewImageService(serviceTimeOut, bucketRepoImage)
 }
 
 func bootstrapFiber() *fiber.App {
@@ -135,6 +142,7 @@ func migrateMariadb(db *gorm.DB) {
 func main() {
 	bootstrap()
 	db.InitMariadb()
+	db.InitGcStorage()
 	migrateMariadb(db.Mariadb)
 	bootstrapServices()
 
@@ -160,7 +168,8 @@ func initHttp() {
 	http_api.NewAdminUserHttpApiDelivery(adminApiRoute)
 
 	//Client Route
-	// clientApiRoute := wV1ApiRoute.Group("/app")
+	clientApiRoute := wV1ApiRoute.Group("/app", middleware.ValidateJWT)
+	http_api.NewImageHttpApiDelivery(clientApiRoute, imageService)
 
 	//Public Route
 	// publicApiRoute := wV1ApiRoute.Group("/public")
