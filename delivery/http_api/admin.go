@@ -7,17 +7,17 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type httpUserApiDelivery struct {
+type httpAdminUserApiDelivery struct {
 }
 
 func NewAdminUserHttpApiDelivery(app fiber.Router, middlewares ...func(*fiber.Ctx) error) {
-	handler := httpUserApiDelivery{}
+	handler := httpAdminUserApiDelivery{}
 	group := app.Group("user", middlewares...)
 
 	group.Get("/", handler.GetUser)
 }
 
-func (h *httpUserApiDelivery) GetUser(ctx *fiber.Ctx) error {
+func (h *httpAdminUserApiDelivery) GetUser(ctx *fiber.Ctx) error {
 	wg := ctx.Locals("wg").(*sync.WaitGroup)
 	wg.Add(1)
 	defer wg.Done()

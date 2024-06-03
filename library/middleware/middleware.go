@@ -13,6 +13,10 @@ import (
 func GetUserId(ctx *fiber.Ctx) uint {
 	return ctx.Locals("user_id").(uint)
 }
+
+func GetRole(ctx *fiber.Ctx) domain.Role {
+	return ctx.Locals("role").(domain.Role)
+}
 func CreateToken(userId uint, role domain.Role, tokenExpire int64) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": int64(userId),
