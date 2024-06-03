@@ -1,6 +1,7 @@
 package http_api
 
 import (
+	"fmt"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -32,13 +33,16 @@ func (i *httpImageApiDelivery) UploadImage(ctx *fiber.Ctx) error {
 	userId := middleware.GetUserId(ctx)
 	file, err := ctx.FormFile("file")
 	if err != nil {
+		fmt.Println(err)
 		return fiber_response.ReturnStatusUnprocessableEntity(ctx, "Failed to parse form", err)
 	}
 	if file == nil {
+		fmt.Println(err)
 		return fiber_response.ReturnStatusUnprocessableEntity(ctx, "No image detected", nil)
 	}
 	fileContents, err := file.Open()
 	if err != nil {
+		fmt.Println(err)
 		return fiber_response.ReturnStatusUnprocessableEntity(ctx, "Failed to open file", err)
 	}
 	defer fileContents.Close()
@@ -46,18 +50,20 @@ func (i *httpImageApiDelivery) UploadImage(ctx *fiber.Ctx) error {
 	buffer := make([]byte, 512)
 	_, err = fileContents.Read(buffer)
 	if err != nil {
+		fmt.Println(err)
 		return fiber_response.ReturnStatusUnprocessableEntity(ctx, "Failed to read buffer", err)
 	}
 	fileType := mimetype.Detect(buffer)
 	if filepath.Ext(file.Filename) == ".gif" {
-		return fiber_response.ReturnStatusUnprocessableEntity(ctx, "file type must be image", err)
+		return fiber_response.ReturnStatusUnprocessableEntity(ctx, "file type must be image", nil)
 	}
 
 	if !strings.HasPrefix(fileType.String(), "image/") {
-		return fiber_response.ReturnStatusUnprocessableEntity(ctx, "file type must be image", err)
+		return fiber_response.ReturnStatusUnprocessableEntity(ctx, "file type must be image", nil)
 	}
 	res, err := i.imageService.UploadImage(file, userId)
 	if err != nil {
+		fmt.Println(err)
 		return fiber_response.ReturnStatusUnprocessableEntity(ctx, "Failed to upload file", err)
 	}
 	return fiber_response.ReturnStatusCreated(ctx, "Success", res)
