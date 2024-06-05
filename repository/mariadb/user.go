@@ -20,7 +20,8 @@ func NewMariadbUserRepository(client *gorm.DB) domain.UserRepository {
 func (u *mariadbUserRepository) Create(user domain.AuthRegisterRequest) (uint, error) {
 	newUser := &domain.User{
 		Role:     domain.Client,
-		Username: user.Username,
+		Username: user.Name,
+		Email:    user.Email,
 		Password: user.Password,
 	}
 	result := u.mariadb.Create(newUser)
@@ -38,9 +39,9 @@ func (u *mariadbUserRepository) GetByUserId(userId uint) (domain.User, error) {
 	return user, nil
 }
 
-func (u *mariadbUserRepository) GetByUsername(username string) (domain.User, error) {
+func (u *mariadbUserRepository) GetByEmail(email string) (domain.User, error) {
 	var user domain.User
-	result := u.mariadb.First(&user, "username = ?", username)
+	result := u.mariadb.First(&user, "email = ?", email)
 	if result.Error != nil {
 		return domain.User{}, result.Error
 	}

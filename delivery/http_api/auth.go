@@ -1,6 +1,7 @@
 package http_api
 
 import (
+	"net/mail"
 	"sync"
 	"time"
 
@@ -42,6 +43,11 @@ func (h *httpAuthApiDelivery) AuthLogin(ctx *fiber.Ctx) error {
 		return fiber_response.ReturnStatusUnprocessableEntity(ctx, "Failed to parses body", er)
 	}
 
+	_, err := mail.ParseAddress(req.Email)
+	if err != nil {
+		return fiber_response.ReturnStatusUnprocessableEntity(ctx, "Email not valid", err)
+	}
+
 	authRes, err := h.authService.AuthenticateAdmin(req)
 	if err != nil {
 		if err.Error() == "passsword mismatch" {
@@ -55,9 +61,15 @@ func (h *httpAuthApiDelivery) AuthLogin(ctx *fiber.Ctx) error {
 	if err != nil {
 		return fiber_response.ReturnStatusUnprocessableEntity(ctx, err.Error(), err)
 	}
-	return fiber_response.ReturnStatusOk(ctx, "Welcome", map[string]any{
-		"token":   token,
-		"user_id": authRes.ID,
+	statusCode := fiber.StatusOK
+	return ctx.Status(statusCode).JSON(fiber.Map{
+		"error":   false,
+		"message": "success",
+		"loginResult": map[string]any{
+			"userId": authRes.ID,
+			"name":   authRes.Username,
+			"token":  token,
+		},
 	})
 }
 func (h *httpAuthApiDelivery) AuthRegister(ctx *fiber.Ctx) error {
@@ -75,8 +87,9 @@ func (h *httpAuthApiDelivery) AuthRegister(ctx *fiber.Ctx) error {
 		return fiber_response.ReturnStatusUnprocessableEntity(ctx, "Failed to parses body", er)
 	}
 
-	if req.Password != req.ReEnterPassword {
-		return fiber_response.ReturnStatusUnprocessableEntity(ctx, "Password must be the same", nil)
+	_, err := mail.ParseAddress(req.Email)
+	if err != nil {
+		return fiber_response.ReturnStatusUnprocessableEntity(ctx, "Email not valid", err)
 	}
 
 	hpass, err := bcrypt.GenerateFromPassword([]byte(req.Password), 10)
@@ -86,12 +99,14 @@ func (h *httpAuthApiDelivery) AuthRegister(ctx *fiber.Ctx) error {
 
 	req.Password = string(hpass)
 
-	result, err := h.authService.Register(*req)
+	_, err = h.authService.Register(*req)
 	if err != nil {
 		return fiber_response.ReturnStatusServerError(ctx, "Failed to register user", err)
 	}
 
-	return fiber_response.ReturnStatusCreated(ctx, "Success", map[string]any{
-		"user_id": result,
+	statusCode := fiber.StatusCreated
+	return ctx.Status(statusCode).JSON(fiber.Map{
+		"error":    false,
+		"messages": "User Created",
 	})
 }

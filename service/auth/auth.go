@@ -29,7 +29,7 @@ func (c *authService) AuthenticateAdmin(user *domain.AuthLoginRequest) (domain.U
 	_, cancel := context.WithTimeout(context.Background(), c.contextTimeout)
 	defer cancel()
 
-	res, err := c.userRepo.GetByUsername(user.Username)
+	res, err := c.userRepo.GetByEmail(user.Email)
 	if err != nil {
 		return domain.User{}, err
 	}
@@ -89,7 +89,7 @@ func (c *authService) ValidateToken(token string) (domain.TokenPayload, error) {
 }
 
 func (c *authService) Register(req domain.AuthRegisterRequest) (uint, error) {
-	_, err := c.userRepo.GetByUsername(req.Username)
+	_, err := c.userRepo.GetByEmail(req.Email)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return 0, err
 	}

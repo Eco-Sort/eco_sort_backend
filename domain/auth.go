@@ -1,14 +1,14 @@
 package domain
 
 type AuthLoginRequest struct {
-	Username string `json:"username"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
 type AuthRegisterRequest struct {
-	Username        string `json:"username"`
-	Password        string `json:"password"`
-	ReEnterPassword string `json:"re_enter_password"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 type TokenPayload struct {
