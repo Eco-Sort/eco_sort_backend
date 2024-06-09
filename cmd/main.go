@@ -136,6 +136,9 @@ func bootstrapFiber() *fiber.App {
 func migrateMariadb(db *gorm.DB) {
 	db.AutoMigrate(
 		&domain.User{},
+		&domain.Sorting{},
+		&domain.Category{},
+		&domain.Garbage{},
 	)
 }
 
