@@ -15,11 +15,14 @@ import (
 	"github.com/Eco-Sort/eco_sort_backend/domain"
 	"github.com/Eco-Sort/eco_sort_backend/library/db"
 	"github.com/Eco-Sort/eco_sort_backend/library/middleware"
+	"github.com/Eco-Sort/eco_sort_backend/library/ml"
 	gcstorage "github.com/Eco-Sort/eco_sort_backend/repository/gc_storage"
 	"github.com/Eco-Sort/eco_sort_backend/repository/mariadb"
 	"github.com/Eco-Sort/eco_sort_backend/service/auth"
+	"github.com/Eco-Sort/eco_sort_backend/service/garbage"
 	gcimage "github.com/Eco-Sort/eco_sort_backend/service/image"
 	"github.com/bytedance/sonic"
+	"github.com/go-resty/resty/v2"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/joho/godotenv"
@@ -30,8 +33,9 @@ var wgInstance *sync.WaitGroup
 
 // Service
 var (
-	authService  domain.AuthService
-	imageService domain.ImageService
+	authService    domain.AuthService
+	imageService   domain.ImageService
+	garbageService domain.GarbageService
 )
 
 func NewWaitGroup() *sync.WaitGroup {
@@ -45,20 +49,22 @@ var wg = NewWaitGroup()
 
 func bootstrap() {
 	godotenv.Load()
-
 }
 
 func bootstrapServices() {
 	serviceTimeOut := 180 * time.Second
+	restyClient := resty.New()
 
 	//Master
 	masterRepoUser := mariadb.NewMariadbUserRepository(db.Mariadb)
+	masterRepoGarbage := mariadb.NewMariadbGarbageRepository(db.Mariadb)
 
 	//Buckets
 	bucketRepoImage := gcstorage.NewGcStorageRepository(db.GcStorage)
 
 	authService = auth.NewAuthService(serviceTimeOut, masterRepoUser)
-	imageService = gcimage.NewImageService(serviceTimeOut, bucketRepoImage)
+	imageService = gcimage.NewImageService(serviceTimeOut, bucketRepoImage, restyClient)
+	garbageService = garbage.NewGarbageService(serviceTimeOut, masterRepoGarbage)
 }
 
 func bootstrapFiber() *fiber.App {
@@ -138,6 +144,7 @@ func migrateMariadb(db *gorm.DB) {
 		&domain.User{},
 		&domain.Sorting{},
 		&domain.Category{},
+		&domain.ImageObject{},
 		&domain.Garbage{},
 	)
 }
@@ -146,6 +153,8 @@ func main() {
 	bootstrap()
 	db.InitMariadb()
 	db.InitGcStorage()
+	ml.GetMLUrl()
+	ml.GetMLImage()
 	migrateMariadb(db.Mariadb)
 	bootstrapServices()
 
@@ -172,7 +181,7 @@ func initHttp() {
 
 	//Client Route
 	clientApiRoute := wV1ApiRoute.Group("/app", middleware.ValidateJWT)
-	http_api.NewImageHttpApiDelivery(clientApiRoute, imageService)
+	http_api.NewImageHttpApiDelivery(clientApiRoute, imageService, garbageService)
 
 	//Public Route
 	// publicApiRoute := wV1ApiRoute.Group("/public")

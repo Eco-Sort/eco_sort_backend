@@ -1,0 +1,114 @@
+[
+  {
+    "label": "Aluminium foil",
+    "sorting_id": 2
+  },
+  {
+    "label": "Battery",
+    "sorting_id": 2
+  },
+  {
+    "label": "Blister pack",
+    "sorting_id": 2
+  },
+  {
+    "label": "Bottle",
+    "sorting_id": 2
+  },
+  {
+    "label": "Bottle cap",
+    "sorting_id": 2
+  },
+  {
+    "label": "Broken glass",
+    "sorting_id": 2
+  },
+  {
+    "label": "Can",
+    "sorting_id": 2
+  },
+  {
+    "label": "Carton",
+    "sorting_id": 2
+  },
+  {
+    "label": "Cup",
+    "sorting_id": 2
+  },
+  {
+    "label": "Food waste",
+    "sorting_id": 1
+  },
+  {
+    "label": "Glass jar",
+    "sorting_id": 2
+  },
+  {
+    "label": "Lid",
+    "sorting_id": 2
+  },
+  {
+    "label": "Other plastic",
+    "sorting_id": 2
+  },
+  {
+    "label": "Paper",
+    "sorting_id": 2
+  },
+  {
+    "label": "Paper bag",
+    "sorting_id": 2
+  },
+  {
+    "label": "Plastic bag & wrapper",
+    "sorting_id": 2
+  },
+  {
+    "label": "Plastic container",
+    "sorting_id": 2
+  },
+  {
+    "label": "Plastic gloves",
+    "sorting_id": 2
+  },
+  {
+    "label": "Plastic utensils",
+    "sorting_id": 2
+  },
+  {
+    "label": "Pop tab",
+    "sorting_id": 2
+  },
+  {
+    "label": "Rope & strings",
+    "sorting_id": 2
+  },
+  {
+    "label": "Scrap metal",
+    "sorting_id": 2
+  },
+  {
+    "label": "Shoe",
+    "sorting_id": 2
+  },
+  {
+    "label": "Squeezable tube",
+    "sorting_id": 2
+  },
+  {
+    "label": "Straw",
+    "sorting_id": 2
+  },
+  {
+    "label": "Styrofoam piece",
+    "sorting_id": 2
+  },
+  {
+    "label": "Unlabeled litter",
+    "sorting_id": 3
+  },
+  {
+    "label": "Cigarette",
+    "sorting_id": 2
+  }
+]

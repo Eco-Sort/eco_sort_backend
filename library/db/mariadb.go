@@ -2,6 +2,7 @@ package db
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"os"
 
@@ -14,6 +15,7 @@ var Mariadb *gorm.DB
 func InitMariadb() {
 	connection := os.Getenv("MARIADB_CONNECTION")
 	database := os.Getenv("MARIADB_DATABASE")
+	fmt.Println(connection)
 	if connection == "" {
 		e := errors.New("undefined MARIADB_CONNECTION")
 		log.Fatal(e)

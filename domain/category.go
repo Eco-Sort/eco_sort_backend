@@ -8,3 +8,12 @@ type Category struct {
 	Label     string   `gorm:"not null" json:"label"`
 	Sorting   *Sorting `gorm:"foreignKey:SortingID"`
 }
+
+type CategoryRequest struct {
+	SortingID uint   `json:"sorting_id"`
+	Label     string `json:"label"`
+}
+
+type CategoryRepository interface {
+	Create(category CategoryRequest) (uint, error)
+}

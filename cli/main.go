@@ -28,14 +28,22 @@ func main() {
 		SetShortDescription("generating seed for category, sorting, and 1 admin user").
 		SetAction(func(m1 map[string]commando.ArgValue, m2 map[string]commando.FlagValue) {
 			Init()
-			masterRepoUser := mariadb.NewMariadbUserRepository(db.Mariadb)
+			db.Mariadb.AutoMigrate(
+				&domain.User{},
+				&domain.Sorting{},
+				&domain.Category{},
+				&domain.ImageObject{},
+				&domain.Garbage{},
+			)
+			masterCategoryRepo := mariadb.NewMariadbCategoryRepository(db.Mariadb)
+			masterSortingRepo := mariadb.NewMariadbSortingRepository(db.Mariadb)
 
 			categoryContent, err := os.ReadFile("./seed/category.json")
 			if err != nil {
 				log.Fatal("Error when opening file: ", err)
 			}
 
-			var category []domain.Category
+			var category []domain.CategoryRequest
 			err = json.Unmarshal(categoryContent, &category)
 			if err != nil {
 				log.Fatal("Error when unmarshaling json category: ", err)
@@ -46,12 +54,27 @@ func main() {
 				log.Fatal("Error when opening file: ", err)
 			}
 
-			var sorting []domain.Sorting
+			var sorting []domain.SortingRequest
 			err = json.Unmarshal(sortingContent, &sorting)
 			if err != nil {
 				log.Fatal("Error when unmarshaling json sorting: ", err)
 			}
 
+			for _, s := range sorting {
+				res, err := masterSortingRepo.Create(s)
+				if err != nil {
+					log.Fatal("Error when creating sorting: ", err)
+				}
+				fmt.Println(res)
+			}
+
+			for _, s := range category {
+				res, err := masterCategoryRepo.Create(s)
+				if err != nil {
+					log.Fatal("Error when creating category: ", err)
+				}
+				fmt.Println(res)
+			}
 		})
 	commando.Parse(nil)
 }
