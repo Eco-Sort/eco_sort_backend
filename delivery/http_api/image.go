@@ -88,6 +88,7 @@ func (i *httpImageApiDelivery) UploadImage(ctx *fiber.Ctx) error {
 	}
 	var imageObject = []domain.ImageObject{}
 	for _, s := range res.Result {
+		fmt.Println(s.Class)
 		imageObject = append(imageObject, domain.ImageObject{
 			CategoryID: uint(s.Class),
 			Confidence: s.Score,
@@ -105,11 +106,12 @@ func (i *httpImageApiDelivery) UploadImage(ctx *fiber.Ctx) error {
 		fmt.Println(err)
 		return fiber_response.ReturnStatusUnprocessableEntity(ctx, "Failed to getting garbage", err)
 	}
+
 	var imageObjects []map[string]any
-	for _, imageObject := range garbage.ImageObject {
+	for _, imageObject := range getGarbage.ImageObject {
 		imageObjects = append(imageObjects, map[string]any{
-			"classification": imageObject.Category,
-			"sorting":        imageObject.Category.Sorting,
+			"classification": imageObject.Category.Label,
+			"sorting":        imageObject.Category.Sorting.SortingBin,
 			"confidence":     imageObject.Confidence,
 		})
 	}

@@ -15,17 +15,18 @@ func NewMariadbGarbageRepository(client *gorm.DB) domain.GarbageRepository {
 	}
 }
 
-func (r *mariadbGarbageRepository) Create(category domain.Garbage) (uint, error) {
-	newGarbage := category
-	for _, imageObject := range newGarbage.ImageObject {
-		res := r.mariadb.Create(&imageObject)
-		if res.Error != nil {
-			return 0, res.Error
-		}
-	}
+func (r *mariadbGarbageRepository) Create(garbage domain.Garbage) (uint, error) {
+	newGarbage := garbage
 	result := r.mariadb.Create(&newGarbage)
 	if result.Error != nil {
 		return 0, result.Error
+	}
+	for _, s := range newGarbage.ImageObject {
+		s.GarbageID = newGarbage.ID
+		res := r.mariadb.Omit("id").Create(&s)
+		if res.Error != nil {
+			return 0, res.Error
+		}
 	}
 	return newGarbage.ID, nil
 }

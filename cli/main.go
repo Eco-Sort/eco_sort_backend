@@ -28,12 +28,13 @@ func main() {
 		SetShortDescription("generating seed for category, sorting, and 1 admin user").
 		SetAction(func(m1 map[string]commando.ArgValue, m2 map[string]commando.FlagValue) {
 			Init()
-			db.Mariadb.AutoMigrate(
-				&domain.User{},
+			db.Mariadb.Migrator().DropTable(
 				&domain.Sorting{},
 				&domain.Category{},
-				&domain.ImageObject{},
-				&domain.Garbage{},
+			)
+			db.Mariadb.AutoMigrate(
+				&domain.Sorting{},
+				&domain.Category{},
 			)
 			masterCategoryRepo := mariadb.NewMariadbCategoryRepository(db.Mariadb)
 			masterSortingRepo := mariadb.NewMariadbSortingRepository(db.Mariadb)
