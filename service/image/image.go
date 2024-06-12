@@ -69,6 +69,5 @@ func (i *imageService) ProcessImage(file *multipart.FileHeader) (domain.MLRespon
 	if err != nil {
 		return domain.MLResponse{}, err
 	}
-	fmt.Println(res)
 	return res, nil
 }

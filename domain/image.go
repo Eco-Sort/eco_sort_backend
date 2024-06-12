@@ -12,10 +12,10 @@ var (
 )
 
 type MLResponse struct {
-	Filename  string     `json:"filename"`
-	Filepath  string     `json:"filepath"`
-	Result    []MLResult `json:"result"`
-	TimeTaken string     `json:"time_taken"`
+	Filename  string              `json:"filename"`
+	Filepath  string              `json:"filepath"`
+	Result    map[string]MLResult `json:"result"`
+	TimeTaken string              `json:"time_taken"`
 }
 
 type MLResult struct {

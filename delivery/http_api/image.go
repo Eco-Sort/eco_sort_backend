@@ -71,7 +71,7 @@ func (i *httpImageApiDelivery) UploadImage(ctx *fiber.Ctx) error {
 		return fiber_response.ReturnStatusUnprocessableEntity(ctx, "Failed to upload file", err)
 	}
 	filePath := domain.MLImage
-	fileLocal, err := os.Open(filePath + res.Filename)
+	fileLocal, err := os.Open(filePath + "/" + res.Filename)
 	if err != nil {
 		panic(err)
 	}
