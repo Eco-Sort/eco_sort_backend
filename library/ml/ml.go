@@ -23,5 +23,5 @@ func GetMLImage() {
 		e := errors.New("undefined ML_IMAGE")
 		log.Fatal(e)
 	}
-	domain.MLUrl = image
+	domain.MLImage = image
 }
