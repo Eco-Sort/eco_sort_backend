@@ -90,7 +90,7 @@ func (i *httpImageApiDelivery) UploadImage(ctx *fiber.Ctx) error {
 	for _, s := range res.Result {
 		fmt.Println(s.Class)
 		imageObject = append(imageObject, domain.ImageObject{
-			CategoryID: uint(s.Class),
+			CategoryID: uint(s.Class) - 1,
 			Confidence: s.Score,
 		})
 	}
