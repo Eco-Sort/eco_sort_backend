@@ -29,15 +29,13 @@ func main() {
 		SetAction(func(m1 map[string]commando.ArgValue, m2 map[string]commando.FlagValue) {
 			Init()
 			db.Mariadb.Migrator().DropTable(
-				&domain.Sorting{},
 				&domain.Category{},
 			)
 			db.Mariadb.AutoMigrate(
-				&domain.Sorting{},
 				&domain.Category{},
 			)
 			masterCategoryRepo := mariadb.NewMariadbCategoryRepository(db.Mariadb)
-			masterSortingRepo := mariadb.NewMariadbSortingRepository(db.Mariadb)
+			// masterSortingRepo := mariadb.NewMariadbSortingRepository(db.Mariadb)
 
 			categoryContent, err := os.ReadFile("./seed/category.json")
 			if err != nil {
@@ -50,24 +48,24 @@ func main() {
 				log.Fatal("Error when unmarshaling json category: ", err)
 			}
 
-			sortingContent, err := os.ReadFile("./seed/sorting.json")
-			if err != nil {
-				log.Fatal("Error when opening file: ", err)
-			}
+			// sortingContent, err := os.ReadFile("./seed/sorting.json")
+			// if err != nil {
+			// 	log.Fatal("Error when opening file: ", err)
+			// }
 
-			var sorting []domain.SortingRequest
-			err = json.Unmarshal(sortingContent, &sorting)
-			if err != nil {
-				log.Fatal("Error when unmarshaling json sorting: ", err)
-			}
+			// var sorting []domain.SortingRequest
+			// err = json.Unmarshal(sortingContent, &sorting)
+			// if err != nil {
+			// 	log.Fatal("Error when unmarshaling json sorting: ", err)
+			// }
 
-			for _, s := range sorting {
-				res, err := masterSortingRepo.Create(s)
-				if err != nil {
-					log.Fatal("Error when creating sorting: ", err)
-				}
-				fmt.Println(res)
-			}
+			// for _, s := range sorting {
+			// 	res, err := masterSortingRepo.Create(s)
+			// 	if err != nil {
+			// 		log.Fatal("Error when creating sorting: ", err)
+			// 	}
+			// 	fmt.Println(res)
+			// }
 
 			for _, s := range category {
 				res, err := masterCategoryRepo.Create(s)

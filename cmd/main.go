@@ -144,8 +144,8 @@ func migrateMariadb(db *gorm.DB) {
 		&domain.User{},
 		&domain.Sorting{},
 		&domain.Category{},
-		&domain.ImageObject{},
 		&domain.Garbage{},
+		&domain.ImageObject{},
 	)
 }
 
